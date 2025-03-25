@@ -1,0 +1,17 @@
+root@postgres-5df45ccb6-xxnlm:/# psql --user=admin --dbname=gitbucket -W
+Password:
+psql (17.4 (Debian 17.4-1.pgdg120+2))
+Type "help" for help.
+
+gitbucket=#
+gitbucket=#
+gitbucket=# CREATE USER gitbucket WITH ENCRYPTED PASSWORD 'gitbucket';
+CREATE ROLE
+gitbucket=# GRANT ALL PRIVILEGES ON DATABASE gitbucket TO gitbucket;
+GRANT
+gitbucket=# GRANT CONNECT ON database gitbucket to gitbucket;
+GRANT
+gitbucket=# GRANT ALL ON SCHEMA public TO gitbucket;
+GRANT
+gitbucket=#
+gitbucket=# exit

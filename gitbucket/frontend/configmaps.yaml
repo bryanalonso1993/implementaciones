@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitbucket-config
+  namespace: platform-gitbucket-prod
+  labels:
+    app: cfg-gitbucket-pro
+    env: production
+data:
+  # Configuracion de la base de datos
+  GITBUCKET_DB_URL: "jdbc:postgresql://postgres.platform-gitbucket-prod.svc.cluster.local:5432/gitbucket"
+  GITBUCKET_DB_USER: gitbucket
+  GITBUCKET_DB_PASSWORD: gitbucket
+  # Configuracion aplicacion
+  GITBUCKET_PORT: "8080"
+  GITBUCKET_MAXFILESIZE: "10485760"

@@ -1,0 +1,56 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  postgres
+  namespace: platform-gitbucket-prod
+  labels:
+    app: postgres
+    env: production
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app:  postgres
+    spec:
+      containers:
+      - name:  postgres
+        # image: docker.io/library/postgres:latest
+        # imagePullPolicy: IfNotPresent
+        image:  postgres:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 100m
+            memory: 100Mi
+        envFrom:
+          - configMapRef:
+              name: cfg-postgres
+        ports:
+          - containerPort:  5432
+            name:  postgres-port
+        volumeMounts:
+          - name: postgres-volume
+            mountPath: /var/lib/postgresql/data
+        #   - name: tz-config
+        #     mountPath: /etc/localtime
+      volumes:
+        - name: postgres-volume
+          persistentVolumeClaim:
+            claimName: pvc-postgres
+        # - name: tz-config
+        #   hostPath:
+        #     path: /usr/share/zoneinfo/America/Lima
+        #     type: File
+      restartPolicy: Always

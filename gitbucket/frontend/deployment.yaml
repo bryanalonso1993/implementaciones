@@ -1,0 +1,58 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  gitbucket
+  namespace: platform-gitbucket-prod
+  labels:
+    app:  gitbucket
+spec:
+  selector:
+    matchLabels:
+      app: gitbucket-prd
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app:  gitbucket-prd
+    spec:
+      containers:
+      - name:  gitbucket
+        image:  gitbucket/gitbucket:latest
+        command: ["java"]
+        args: ["-jar", "/opt/gitbucket.war"]
+        resources:
+          requests:
+            cpu: 400m
+            memory: 200Mi
+          limits:
+            cpu: 800m
+            memory: 400Mi
+        envFrom:
+          - configMapRef:
+              name: gitbucket-config
+        ports:
+        - containerPort:  8080
+          name:  gitbucket-port
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-gitbucket-external
+  namespace: platform-gitbucket-prod
+spec:
+  selector:
+    app: gitbucket-prd
+  type: NodePort
+  ports:
+  - name: gitbucket-port
+    protocol: TCP
+    port: 8080
+    targetPort: 8080
+    nodePort: 30140
