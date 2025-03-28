@@ -9,7 +9,7 @@ metadata:
     env: production
 data:
   # Configuracion de la base de datos
-  GITBUCKET_DB_URL: "jdbc:postgresql://postgres.platform-gitbucket-prod.svc.cluster.local:5432/gitbucket"
+  GITBUCKET_DB_URL: "jdbc:postgresql://svc-postgres.platform-gitbucket-prod.svc.cluster.local:5432/gitbucket"
   GITBUCKET_DB_USER: gitbucket
   GITBUCKET_DB_PASSWORD: gitbucket
   # Configuracion aplicacion

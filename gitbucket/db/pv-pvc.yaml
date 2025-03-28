@@ -11,7 +11,7 @@ spec:
     - ReadWriteOnce
   storageClassName: postgresql
   hostPath:
-    path: "/Users/bryanalonso/postgresql_storage"
+    path: "/Users/bryanalonsoalmeydacontreras/postgresql_storage"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

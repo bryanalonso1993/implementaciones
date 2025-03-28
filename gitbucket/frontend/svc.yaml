@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-gitbucket-external
+  namespace: platform-gitbucket-prod
+spec:
+  selector:
+    app: gitbucket-prd
+  type: NodePort
+  ports:
+  - name: gitbucket-port
+    protocol: TCP
+    port: 8080
+    targetPort: 8080
+    nodePort: 30140

@@ -28,11 +28,11 @@ spec:
         args: ["-jar", "/opt/gitbucket.war"]
         resources:
           requests:
-            cpu: 400m
-            memory: 200Mi
-          limits:
-            cpu: 800m
+            cpu: "2"
             memory: 400Mi
+          limits:
+            cpu: "4"
+            memory: 800Mi
         envFrom:
           - configMapRef:
               name: gitbucket-config
@@ -40,19 +40,3 @@ spec:
         - containerPort:  8080
           name:  gitbucket-port
       restartPolicy: Always
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: svc-gitbucket-external
-  namespace: platform-gitbucket-prod
-spec:
-  selector:
-    app: gitbucket-prd
-  type: NodePort
-  ports:
-  - name: gitbucket-port
-    protocol: TCP
-    port: 8080
-    targetPort: 8080
-    nodePort: 30140
