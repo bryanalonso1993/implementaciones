@@ -29,14 +29,21 @@ spec:
         resources:
           requests:
             cpu: "2"
-            memory: 400Mi
+            memory: 800Mi
           limits:
             cpu: "4"
-            memory: 800Mi
+            memory: 1200Mi
         envFrom:
           - configMapRef:
               name: gitbucket-config
         ports:
-        - containerPort:  8080
-          name:  gitbucket-port
+          - containerPort:  8080
+            name:  gitbucket-port
+        volumeMounts:
+          - name: frontend-repository
+            mountPath: "/gitbucket"
+      volumes:
+        - name: frontend-repository
+          persistentVolumeClaim:
+            claimName: pvc-gitbucket
       restartPolicy: Always
