@@ -1,1 +1,3 @@
 proyecto_api_enlaces/node_modules
+airflow/Pipfile
+airflow/Pipfile.lock

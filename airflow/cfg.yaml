@@ -1,0 +1,22 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: airflow-config
+  namespace: airflow
+  labels:
+    env: production
+    app: airflow
+data:
+  AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+  AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://admin:claro123@svc-postgres.platform-gitbucket-prod.svc.cluster.local:5432/airflow
+  AIRFLOW__CELERY__BROKER_URL: redis://airflow-redis.airflow.svc.cluster.local:6379/0
+  AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://admin:claro123@svc-postgres.platform-gitbucket-prod.svc.cluster.local:5432/airflow
+  AIRFLOW__CELERY__CELERY_RESULT_BACKEND: redis://airflow-redis.airflow.svc.cluster.local:6379/1
+  AIRFLOW__CELERY__RESULT_PERSISTENT: 'True'
+  AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'True'
+  AIRFLOW__CELERY__WORKER_CONCURRENCY: "2"
+  AIRFLOW__CELERY__FLOWER_STORAGE: redis://airflow-redis.airflow.svc.cluster.local:6379/2
+  AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+  AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
+  FLASK_LIMITER_STORAGE_URI: redis://airflow-redis.airflow.svc.cluster.local:6379/3

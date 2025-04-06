@@ -1,0 +1,29 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: airflow-init
+  namespace: airflow
+spec:
+  template:
+    spec:
+      containers:
+        - name: airflow-init
+          image: apache/airflow:2.6.0
+          #command: ["airflow", "db", "init"]
+          command:
+            - bash
+            - -c
+            - | 
+              airflow users create \
+              --username "$AIRFLOW_WEBSERVER_USER" \
+              --firstname Admin \
+              --lastname User \
+              --role Admin \
+              --email admin@example.com \
+              --password "Starmania_1"
+          envFrom:
+            - configMapRef:
+                name: airflow-config
+      restartPolicy: Never
+  backoffLimit: 4
