@@ -1,0 +1,87 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-airflow-logs
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    -  ReadWriteMany
+  storageClassName: airflow-logs
+  hostPath:
+    path: /Users/bryanalonsoalmeydacontreras/kubernetes/implementaciones/airflow/airflow-logs
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-airflow-dags
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    -  ReadWriteMany
+  storageClassName: airflow-dags
+  hostPath:
+    path: /Users/bryanalonsoalmeydacontreras/kubernetes/implementaciones/airflow/airflow-dags
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-airflow-logs
+  namespace: platform-airflow-prod
+  labels:
+    app: airflow
+    env: production
+spec:
+  storageClassName: airflow-logs
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-airflow-dags
+  namespace: platform-airflow-prod
+  labels:
+    app: airflow
+    env: production
+spec:
+  storageClassName: airflow-dags
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-postgres
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    -  ReadWriteMany
+  storageClassName: postgresql
+  hostPath:
+    path: /Users/bryanalonsoalmeydacontreras/kubernetes/implementaciones/airflow/postgres_storage
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-postgres
+  namespace: platform-airflow-prod
+  labels:
+    app: airflow
+    env: production
+spec:
+  storageClassName: postgresql
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 8Gi

@@ -3,7 +3,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: airflow-init
-  namespace: airflow
+  namespace: platform-airflow-prod
 spec:
   template:
     spec:
@@ -15,15 +15,16 @@ spec:
             - bash
             - -c
             - | 
+              airflow db init && \
               airflow users create \
-              --username "$AIRFLOW_WEBSERVER_USER" \
+              --username "Airflow Admin" \
               --firstname Admin \
               --lastname User \
               --role Admin \
               --email admin@example.com \
-              --password "Starmania_1"
+              --password "Starmania_10"
           envFrom:
             - configMapRef:
-                name: airflow-config
+                name: cfg-scheduler
       restartPolicy: Never
   backoffLimit: 4

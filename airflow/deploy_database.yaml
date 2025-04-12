@@ -1,0 +1,50 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: platform-airflow-prod
+  labels:
+    app: postgres
+    env: production
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app:  postgres
+    spec:
+      containers:
+      - name: postgres
+        # image: docker.io/library/postgres:latest
+        # imagePullPolicy: IfNotPresent
+        image: postgres:15
+        resources:
+          requests:
+            cpu: "500m"
+            memory: 1000Mi
+          limits:
+            cpu: "1000m"
+            memory: 4000Mi
+        envFrom:
+          - configMapRef:
+              name: cfg-postgres
+        ports:
+          - containerPort:  5432
+            name:  postgres-port
+        volumeMounts:
+          - name: postgres-volume
+            mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: postgres-volume
+          persistentVolumeClaim:
+            claimName: pvc-postgres
+      restartPolicy: Always

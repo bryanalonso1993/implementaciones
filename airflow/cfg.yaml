@@ -1,22 +1,87 @@
 ---
 apiVersion: v1
 kind: ConfigMap
-metadata:
-  name: airflow-config
-  namespace: airflow
-  labels:
-    env: production
-    app: airflow
+metadata: 
+  name: cfg-webserver
+  namespace: platform-airflow-prod
 data:
   AIRFLOW__CORE__EXECUTOR: CeleryExecutor
-  AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://admin:claro123@svc-postgres.platform-gitbucket-prod.svc.cluster.local:5432/airflow
-  AIRFLOW__CELERY__BROKER_URL: redis://airflow-redis.airflow.svc.cluster.local:6379/0
-  AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://admin:claro123@svc-postgres.platform-gitbucket-prod.svc.cluster.local:5432/airflow
-  AIRFLOW__CELERY__CELERY_RESULT_BACKEND: redis://airflow-redis.airflow.svc.cluster.local:6379/1
-  AIRFLOW__CELERY__RESULT_PERSISTENT: 'True'
-  AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'True'
-  AIRFLOW__CELERY__WORKER_CONCURRENCY: "2"
-  AIRFLOW__CELERY__FLOWER_STORAGE: redis://airflow-redis.airflow.svc.cluster.local:6379/2
-  AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
   AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
-  FLASK_LIMITER_STORAGE_URI: redis://airflow-redis.airflow.svc.cluster.local:6379/3
+  AIRFLOW_LOGGING_REMOTE_LOGGING: "true"
+  AIRFLOW_LOGGING_REMOTE_BASE_LOG_FOLDER: /opt/airflow/logs
+  AIRFLOW_LOGGING_REMOTE_LOG_CONN_ID: ""
+  FLASK_LIMITER_STORAGE_URI: redis://svc-redis:6379/3
+  AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@svc-postgres:5432/airflow
+  AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+  #AIRFLOW__CORE__DEFAULT_TIMEZONE: "America/Lima"
+  #AIRFLOW__WEBSERVER__DEFAULT_UI_TIMEZONE: "America/Lima"
+  #webserver_config.py: |
+  #  from flask_limiter.util import get_remote_address
+  #  def configure_limiter(limiter):
+  #    from airflow.www.app import csrf
+  #    limiter.init_app(
+  #      csrf.app,
+  #      key_func=get_remote_address,
+  #      storage_uri="redis://svc-redis:6379/3"
+  #    )
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cfg-worker
+  namespace: platform-airflow-prod
+data:
+  AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+  AIRFLOW__CELERY__BROKER_URL: redis://svc-redis:6379/0
+  AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@svc-postgres:5432/airflow
+  AIRFLOW__CELERY__WORKER_CONCURRENCY: "4"
+  AIRFLOW__CORE__LOAD_EXAMPLES: "true"
+  AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@svc-postgres:5432/airflow
+  AIRFLOW_LOGGING_REMOTE_LOGGING: "true"
+  AIRFLOW_LOGGING_REMOTE_BASE_LOG_FOLDER: /opt/airflow/logs
+  AIRFLOW_LOGGING_REMOTE_LOG_CONN_ID: ""
+  #AIRFLOW__CORE__DEFAULT_TIMEZONE: "America/Lima"
+  #AIRFLOW__WEBSERVER__DEFAULT_UI_TIMEZONE: "America/Lima"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cfg-redis
+  namespace: platform-airflow-prod
+data:
+  redis.conf: |
+    bind 0.0.0.0
+    protected-mode no
+    port 6379
+    maxmemory 256mb
+    maxmemory-policy allkeys-lru
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cfg-scheduler
+  namespace: platform-airflow-prod
+data:
+  AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+  AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
+  AIRFLOW__CELERY__BROKER_URL: redis://svc-redis:6379/0
+  AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@svc-postgres:5432/airflow
+  AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@svc-postgres:5432/airflow
+  AIRFLOW_LOGGING_REMOTE_LOGGING: "true"
+  AIRFLOW_LOGGING_REMOTE_BASE_LOG_FOLDER: /opt/airflow/logs
+  AIRFLOW_LOGGING_REMOTE_LOG_CONN_ID: ""
+  AIRFLOW__CORE__LOAD_EXAMPLES: "true"
+  #AIRFLOW__CORE__DEFAULT_TIMEZONE: "America/Lima"
+  #AIRFLOW__WEBSERVER__DEFAULT_UI_TIMEZONE: "America/Lima"
+---
+# POSTGRESQL
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cfg-postgres
+  namespace: platform-airflow-prod
+data:
+  POSTGRES_USER: airflow
+  POSTGRES_PASSWORD: airflow
+  POSTGRES_DB: airflow
+  #TZ: America/Lima

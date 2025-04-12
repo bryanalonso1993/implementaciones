@@ -1,0 +1,48 @@
+---
+# Servicio para redis
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-redis
+  namespace: platform-airflow-prod
+spec:
+  selector:
+    app: redis
+  type: ClusterIP
+  ports:
+    - name: redis-port
+      port: 6379
+      targetPort: 6379
+      protocol: TCP
+---
+# Servicio para el Webserver
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-webserver
+  namespace: platform-airflow-prod
+spec:
+  selector:
+    app: webserver
+  ports:
+    - name: webserver-port
+      port: 8080
+      targetPort: 8080
+      nodePort: 31600
+  type: NodePort
+---
+# Servicio para postgres
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-postgres
+  namespace: platform-airflow-prod
+spec:
+  selector:
+    app: postgres
+  type: ClusterIP
+  ports:
+  - name: postgres-port
+    protocol: TCP
+    port: 5432
+    targetPort: 5432

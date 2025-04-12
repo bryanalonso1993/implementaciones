@@ -1,0 +1,129 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-scheduler
+  namespace: platform-airflow-prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scheduler
+  template:
+    metadata:
+      labels:
+        app: scheduler
+    spec:
+      containers:
+        - name: scheduler
+          image: apache/airflow:2.6.0
+          command: ["airflow", "scheduler"]
+          resources:
+            requests:
+              cpu: "500m"
+              memory: 800Mi
+            limits:
+              cpu: "1000m"
+              memory: 1200Mi
+          envFrom:
+            - configMapRef:
+                name: cfg-scheduler
+          volumeMounts:
+            - name: airflow-dags
+              mountPath: /opt/airflow/dags
+            - name: airflow-logs
+              mountPath: /opt/airflow/logs
+      volumes:
+        - name: airflow-dags
+          persistentVolumeClaim: 
+            claimName: pvc-airflow-dags
+        - name: airflow-logs
+          persistentVolumeClaim:
+            claimName: pvc-airflow-logs
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-webserver
+  namespace: platform-airflow-prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webserver
+  template:
+    metadata:
+      labels:
+        app: webserver
+    spec:
+      containers:
+        - name: webserver
+          image: apache/airflow:2.6.0
+          command: ["airflow", "webserver"]
+          resources:
+            requests:
+              cpu: "500m"
+              memory: 800Mi
+            limits:
+              cpu: "1000m"
+              memory: 1200Mi
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: cfg-webserver
+          volumeMounts:
+            - name: airflow-dags
+              mountPath: /opt/airflow/dags
+            - name: airflow-logs
+              mountPath: /opt/airflow/logs
+      volumes:
+        - name: airflow-dags
+          persistentVolumeClaim: 
+            claimName: pvc-airflow-dags
+        - name: airflow-logs
+          persistentVolumeClaim:
+            claimName: pvc-airflow-logs
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-worker
+  namespace: platform-airflow-prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: worker
+  template:
+    metadata:
+      labels:
+        app: worker
+    spec:
+      containers:
+        - name: worker
+          image: apache/airflow:2.6.0
+          command: ["airflow", "celery", "worker"]
+          resources:
+            requests:
+              cpu: "500m"
+              memory: 2000Mi
+            limits:
+              cpu: "1000m"
+              memory: 6000Mi
+          envFrom:
+            - configMapRef:
+                name: cfg-worker
+          volumeMounts:
+            - name: airflow-dags
+              mountPath: /opt/airflow/dags
+            - name: airflow-logs
+              mountPath: /opt/airflow/logs
+      volumes:
+        - name: airflow-dags
+          persistentVolumeClaim: 
+            claimName: pvc-airflow-dags
+        - name: airflow-logs
+          persistentVolumeClaim:
+            claimName: pvc-airflow-logs
