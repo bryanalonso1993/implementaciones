@@ -1,3 +1,4 @@
 proyecto_api_enlaces/node_modules
-airflow/Pipfile
-airflow/Pipfile.lock
+airflow/airflow-dags
+airflow/airflow-logs
+airflow/postgres_storage
