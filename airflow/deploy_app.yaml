@@ -4,6 +4,9 @@ kind: Deployment
 metadata:
   name: airflow-scheduler
   namespace: platform-airflow-prod
+  labels:
+    app: airflow
+    env: production
 spec:
   replicas: 1
   selector:
@@ -12,9 +15,7 @@ spec:
   template:
     metadata:
       labels:
-        app: airflow
-        env: production
-        type: scheduler
+        app: scheduler
     spec:
       containers:
         - name: scheduler
@@ -50,6 +51,9 @@ kind: Deployment
 metadata:
   name: airflow-webserver
   namespace: platform-airflow-prod
+  labels:
+    app: airflow
+    env: production
 spec:
   replicas: 1
   selector:
@@ -58,9 +62,7 @@ spec:
   template:
     metadata:
       labels:
-        app: airflow
-        env: production
-        type: webserver
+        app: webserver
     spec:
       containers:
         - name: webserver
@@ -97,6 +99,9 @@ kind: Deployment
 metadata:
   name: airflow-worker
   namespace: platform-airflow-prod
+  labels:
+    app: airflow
+    env: production
 spec:
   replicas: 1
   selector:
@@ -104,9 +109,8 @@ spec:
       app: worker
   template:
     metadata:
-        app: airflow
-        env: production
-        type: worker
+      labels:
+        app: worker
     spec:
       containers:
         - name: worker
