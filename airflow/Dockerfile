@@ -1,0 +1,15 @@
+FROM apache/airflow:latest
+USER airflow
+RUN pip install \
+    apache-airflow-providers-http \
+    apache-airflow-providers-mysql \
+    apache-airflow-providers-ssh \
+    apache-airflow-providers-apache-spark
+
+# Opcional: instala paquetes adicionales si querés
+# RUN pip install pandas requests boto3
+
+# Copiá tus DAGs si querés empaquetarlos dentro
+# COPY dags/ /opt/airflow/dags/
+
+# Entrypoint ya lo maneja la imagen oficial
