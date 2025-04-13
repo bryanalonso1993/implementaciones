@@ -1,0 +1,25 @@
+---
+# Actualizacion de la base de datos
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: airflow-upgrade
+  namespace: platform-airflow-prod
+spec:
+  template:
+    spec:
+      containers:
+        - name: airflow-init
+          image: apache/airflow:v1
+          imagePullPolicy: IfNotPresent
+          #command: ["airflow", "db", "init"]
+          command:
+            - bash
+            - -c
+            - | 
+              airflow db upgrade
+          envFrom:
+            - configMapRef:
+                name: cfg-scheduler
+      restartPolicy: Never
+  backoffLimit: 4
