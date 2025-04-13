@@ -12,11 +12,14 @@ spec:
   template:
     metadata:
       labels:
-        app: scheduler
+        app: airflow
+        env: production
+        type: scheduler
     spec:
       containers:
         - name: scheduler
-          image: apache/airflow:2.6.0
+          image: apache/airflow:v1
+          imagePullPolicy: IfNotPresent
           command: ["airflow", "scheduler"]
           resources:
             requests:
@@ -55,11 +58,14 @@ spec:
   template:
     metadata:
       labels:
-        app: webserver
+        app: airflow
+        env: production
+        type: webserver
     spec:
       containers:
         - name: webserver
-          image: apache/airflow:2.6.0
+          image: apache/airflow:v1
+          imagePullPolicy: IfNotPresent
           command: ["airflow", "webserver"]
           resources:
             requests:
@@ -98,12 +104,14 @@ spec:
       app: worker
   template:
     metadata:
-      labels:
-        app: worker
+        app: airflow
+        env: production
+        type: worker
     spec:
       containers:
         - name: worker
-          image: apache/airflow:2.6.0
+          image: apache/airflow:v1
+          imagePullPolicy: IfNotPresent
           command: ["airflow", "celery", "worker"]
           resources:
             requests:
