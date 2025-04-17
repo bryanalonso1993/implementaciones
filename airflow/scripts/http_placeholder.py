@@ -23,7 +23,7 @@ with DAG(
     task_invoke_jsonplace=HttpOperator(
         task_id="get_users",
         http_conn_id="http_jsonplaceholder",
-        endpoint="",
+        endpoint="/todos/1",
         method="get",
         headers={"Content-Type": "application/json"},
     )
