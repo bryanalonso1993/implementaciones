@@ -15,3 +15,4 @@ MacBook-Pro-de-bryan:airflow bryanalonsoalmeydacontreras$ kubectl rollout histor
 deployment.apps/airflow-scheduler 
 REVISION  CHANGE-CAUSE
 1         Actualización imagen Airflow v1
+
