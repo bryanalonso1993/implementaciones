@@ -14,42 +14,11 @@ spec:
   hostPath:
     path: "/Users/bryanalonsoalmeydacontreras/prometheus_storage"
 ---
-# pvc para el primer worker
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: pvc-prometheusworker01
-  namespace: stack-prometheus-prod
-spec:
-  storageClassName: prometheus-storage
-  resources:
-    requests:
-      storage: 5Gi
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteMany
----
-# pvc para el segundo worker
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: pvc-prometheusworker02
-  namespace: stack-prometheus-prod
-spec:
-  storageClassName: prometheus-storage
-  resources:
-    requests:
-      storage: 5Gi
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteMany
----
-# pvc para el segundo worker
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: pvc-prometheusmaster01
-  namespace: stack-prometheus-prod
+  name: pvc-prometheusworker
+  namespace: monitoring
 spec:
   storageClassName: prometheus-storage
   resources:

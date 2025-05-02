@@ -9,6 +9,11 @@ ls /etc/cni/net.d
 
 # Labels and Selectors
 kubectl get pods -l 'env in (produccion), role in (frontend)'
+
+controlplane ~ ➜  k get pods -l"env=prod,bu=finance,tier=frontend"
+NAME          READY   STATUS    RESTARTS   AGE
+app-1-zzxdf   1/1     Running   0          5m29s
+
 kubectl get pods -l env=produccion, role=frontend
 
 # contextos kubernetes
@@ -91,3 +96,234 @@ ifconfig flannel.1 down
 alias=k
 export do="-o yaml --dry-run=client"
 
+
+#----------------------------------------
+############# ANNOTATIONS ###############
+#----------------------------------------
+kubectl annotate deployment -l app=airflow kubernetes.io/change-cause="Cambio global en Airflow" --overwrite -n platform-airflow-prod
+
+kubectl annotate deployment -l app=airflow kubernetes.io/change-cause="Actualización imagen Airflow v1" --overwrite
+
+MacBook-Pro-de-bryan:airflow bryanalonsoalmeydacontreras$ kubectl annotate deployment -l app=airflow kubernetes.io/change-cause="Actualización imagen Airflow v1" --overwrite
+deployment.apps/airflow-scheduler annotated
+deployment.apps/airflow-webserver annotated
+deployment.apps/airflow-worker annotated
+
+MacBook-Pro-de-bryan:airflow bryanalonsoalmeydacontreras$ kubectl rollout history deployment airflow-scheduler
+deployment.apps/airflow-scheduler 
+REVISION  CHANGE-CAUSE
+1         Actualización imagen Airflow v1
+
+#---------------------------------------------------
+############# TAINTS AND TOLERATIONS ###############
+#---------------------------------------------------
+
+# Create a taint on node01 with key of spray, value of mortein and effect of NoSchedule
+
+# Key = spray
+# Value = mortein
+# Effect = NoSchedule
+
+controlplane ~ ➜  kubectl taint node node01 spray=mortein:NoSchedule
+node/node01 tainted
+
+controlplane ~ ➜  kubectl describe nodes node01 | grep -i taint
+Taints:             spray=mortein:NoSchedule
+
+#---------------------------------------------------
+############# READINESSPROBE ###############
+#---------------------------------------------------
+
+apiVersion: v1 
+kind: Pod 
+metadata:
+  labels: 
+    name: simple-webapp 
+  name: simple-webapp-2 
+  namespace: default 
+spec: 
+  containers: 
+  - env: 
+    - name: APP_START_DELAY 
+      value: "80" 
+    image: kodekloud/webapp-delayed-start 
+    imagePullPolicy: Always 
+    name: simple-webapp
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: 8080
+    ports: 
+    - containerPort: 8080 
+      protocol: TCP
+
+##
+controlplane ~ ➜  k get pods
+NAME              READY   STATUS    RESTARTS   AGE
+simple-webapp-1   1/1     Running   0          10m
+simple-webapp-2   0/1     Running   0          46s
+
+### READLINESSPROBE
+---
+apiVersion: v1 
+kind: Pod 
+metadata: 
+  labels: 
+    name: simple-webapp 
+  name: simple-webapp-1 
+  namespace: default 
+spec: 
+  containers: 
+  - env: 
+    - name: APP_START_DELAY 
+      value: "80" 
+    image: kodekloud/webapp-delayed-start 
+    imagePullPolicy: Always 
+    name: simple-webapp 
+    livenessProbe:
+      httpGet:
+        path: /live
+        port: 8080 
+      initialDelaySeconds: 80
+      periodSeconds: 1
+    ports: 
+    - containerPort: 8080 
+      protocol: TCP
+---
+apiVersion: v1 
+kind: Pod 
+metadata:
+  labels:
+    name: simple-webapp
+  name: simple-webapp-2
+  namespace: default
+spec:
+  containers:
+  - env:
+    - name: APP_START_DELAY
+      value: "80"
+    image: kodekloud/webapp-delayed-start
+    imagePullPolicy: Always
+    name: simple-webapp
+    livenessProbe:
+      httpGet:
+        path: /live
+        port: 8080
+      initialDelaySeconds: 80
+      periodSeconds: 1
+    ports:
+    - containerPort: 8080
+      protocol: TCP 
+
+############################
+# --- IMPERATIVE COMMANDS
+############################
+
+controlplane ~ ➜  kubectl  create service clusterip redis-service --tcp=6379:6379
+
+controlplane ~ ➜  kubectl  create service clusterip redis-service --tcp=6379:6379 --dry-run=client -o yaml
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: redis-service
+  name: redis-service
+spec:
+  ports:
+  - name: 6379-6379
+    port: 6379
+    protocol: TCP
+    targetPort: 6379
+  selector:
+    app: redis-service
+  type: ClusterIP
+status:
+  loadBalancer: {}
+
+#### CREATE DEPLOYMENT
+controlplane ~ ➜  k create deployment webapp --image=kodekloud/webapp-color --replicas=3 --dry-run=client -o yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: webapp
+  name: webapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: webapp
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: webapp
+    spec:
+      containers:
+      - image: kodekloud/webapp-color
+        name: webapp-color
+        resources: {}
+status: {}
+
+controlplane ~ ➜  k create deployment webapp --image=kodekloud/webapp-color --replicas=3 
+deployment.apps/webapp created
+
+controlplane ~ ➜  k create deployment redis-deploy --replicas=2 --image=redis  --namespace=dev-ns --dry-run=client -o yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: redis-deploy
+  name: redis-deploy
+  namespace: dev-ns
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: redis-deploy
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: redis-deploy
+    spec:
+      containers:
+      - image: redis
+        name: redis
+        resources: {}
+status: {}
+
+controlplane ~ ➜  k create deployment redis-deploy --replicas=2 --image=redis  --namespace=dev-ns 
+deployment.apps/redis-deploy created
+
+
+kubectl expose pod nginx --port=80 --name nginx-service --type=NodePort --dry-run=client -o yaml
+
+#### Create a pod called httpd using the image httpd:alpine in the default namespace. Next, create a service of type ClusterIP by the same name (httpd). The target port for the service should be 80.
+
+controlplane ~ ➜  k expose pod httpd --port=80 --name=httpd --type=ClusterIP --dry-run=client -o yaml
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    run: httpd
+  name: httpd
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    run: httpd
+  type: ClusterIP
+status:
+  loadBalancer: {}
+
+controlplane ~ ➜  k expose pod httpd --port=80 --name=httpd --type=ClusterIP 
+service/httpd exposed
