@@ -10,7 +10,7 @@ spec:
     spec:
       containers:
         - name: airflow-init
-          image: apache/airflow:v1
+          image: apache/airflow:v3
           imagePullPolicy: IfNotPresent
           #command: ["airflow", "db", "init"]
           command:

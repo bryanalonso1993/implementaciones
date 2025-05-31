@@ -1,4 +1,4 @@
-FROM apache/airflow:latest
+FROM apache/airflow:2.10.5
 USER root
 RUN apt-get update && \
     apt-get install -y openjdk-17-jdk
@@ -8,7 +8,9 @@ RUN pip install \
     apache-airflow-providers-mysql \
     apache-airflow-providers-ssh \
     apache-airflow-providers-apache-spark \
-    apache-airflow-providers-elasticsearch
+    apache-airflow-providers-elasticsearch \
+    apache-airflow-providers-cncf-kubernetes \
+    kubernetes
 
 # Opcional: instala paquetes adicionales si querés
 # RUN pip install pandas requests boto3
