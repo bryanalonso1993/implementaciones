@@ -5,3 +5,5 @@ airflow/postgres_storage
 airflow/Pipfile
 airflow/Pipfile.lock
 kube-state-metrics
+spark
+spark-3.5.5-bin-hadoop3
