@@ -17,6 +17,7 @@ spec:
       labels:
         app: scheduler
     spec:
+      serviceAccountName: airflow-sa
       containers:
         - name: scheduler
           image: apache/airflow:v2.10.5
@@ -64,6 +65,7 @@ spec:
       labels:
         app: webserver
     spec:
+      serviceAccountName: airflow-sa
       containers:
         - name: webserver
           image: apache/airflow:v2.10.5
@@ -123,6 +125,7 @@ spec:
       labels:
         app: worker
     spec:
+      serviceAccountName: airflow-sa
       containers:
         - name: worker
           image: apache/airflow:v2.10.5
