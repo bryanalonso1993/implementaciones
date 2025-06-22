@@ -1,0 +1,33 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: minio
+  name: minio
+  namespace: monitoring
+spec:
+  containers:
+    - name: minio
+      image: quay.io/minio/minio:latest
+      resources:
+        requests:
+          cpu: "250m"
+          memory: "64Mi"
+        limits:
+          cpu: "500m"
+          memory: "128Mi"
+      command:
+      - /bin/bash
+      - -c
+      args: 
+      - minio server /data --console-address :9090
+      volumeMounts:
+      - mountPath: /data
+        name: localvolume
+  
+  volumes:
+  - name: localvolume
+    hostPath: 
+      path: /Users/bryanalonsoalmeydacontreras/kubernetes/implementaciones/grafana_labs/minio/minio-storage
+      type: DirectoryOrCreate

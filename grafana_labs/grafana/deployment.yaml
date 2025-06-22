@@ -1,0 +1,67 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: monitoring
+  labels:
+    app: grafana
+    env: production
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      serviceAccountName: sa-grafana
+      containers:
+        - name: grafana
+          image: docker.io/grafana/grafana:12.0.0
+          # imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+              name: http-grafana
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /robots.txt
+              port: 3000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 2
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 3000
+            timeoutSeconds: 1
+          resources:
+            requests:
+              cpu: "1"
+              memory: "2Gi"
+            limits:
+              cpu: "2"
+              memory: "4Gi" 
+          volumeMounts:
+            # - name: tz-config
+            #   mountPath: /etc/localtime
+            - name: grafana-config
+              mountPath: /etc/grafana
+              readOnly: true
+      volumes:
+        # - name: tz-config
+        #   hostPath:
+        #     path: /usr/share/zoneinfo/America/Lima
+        #     type: File
+        - name: grafana-config
+          configMap:
+            name: cfg-grafana
